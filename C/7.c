@@ -35,8 +35,7 @@ int main(int argc, char * argv[], char * envp[]) {
 
 void dirout(DIR * cdir, char * path, char * file_name) {
   DIR * hdir;
-  char
-  var [254];
+  char *var = (char*) malloc(255);
   struct dirent * entry;
   int flag = 0;
 
@@ -68,5 +67,5 @@ void dirout(DIR * cdir, char * path, char * file_name) {
 void write_file_info(char * path, char * name) {
   struct stat st1;
   stat(path, & st1);
-  printf("%s %s %lu %lu %d %lu %lu \n", path, name, st1.st_size, st1.st_mtime, st1.st_mode, (uintmax_t) st1.st_ino);
+  printf("%s %s %lu %lu %d %lu\n", path, name, st1.st_size, st1.st_mtime, st1.st_mode, (uintmax_t) st1.st_ino);
 }
