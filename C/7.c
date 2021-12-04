@@ -13,7 +13,7 @@ void write_file_info(char *
 int dir_cnt;
 int file_cnt;
 
-int main(int argc, char ** argv) {
+int main(int argc, char * argv[], char * envp[]) {
   dir_cnt = 0;
   file_cnt = 0;
   DIR * dir;

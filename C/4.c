@@ -1,72 +1,65 @@
 #include <stdio.h>
-#include <dirent.h>
-#include <errno.h>
-#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <inttypes.h>
+#include <fcntl.h>
+#include <stdlib.h>
 
-void dirout(DIR * cdir, char * path, char * file_name);
-void write_file_info(char *
-  var, char * name);
+char * fget_line(char * buffer, int max, FILE * fp);
 
-int dir_cnt;
-int file_cnt;
+int main(int argc[], char * argv[], char * envp[]) {
+  FILE * file;
+  char * filename = argv[1];
+  int n = strtol(argv[2], NULL, 10);
+  char buff[256];
+  int flag = 1;
 
-int main(int argc, char ** argv) {
-  dir_cnt = 0;
-  file_cnt = 0;
-  DIR * dir;
-  char * file_name;
-  if (argc < 3) {
-    fprintf(stderr, "Too few arguments\n");
+  file = fopen(filename, "r");
+
+  if (n < 0) {
+    printf("N >= 0 %d", n);
     return 1;
   }
-  dir = opendir(argv[1]);
-  file_name = argv[2];
-  if (errno == ENOTDIR) {
-    perror("Isn't dir");
+
+  if (file == NULL) {
+    printf("Error: could not open file %s", filename);
     return 1;
   }
-  dirout(dir, argv[1], file_name);
-  closedir(dir);
+  if (n == 0) {
+    while (fget_line(buff, sizeof(buff), file)) {
+      printf("%s", buff);
+    }
+    printf("%s", buff);
+  } else {
+    while (flag) {
+      getc(stdin);
+      for (int i = 0; i < n; i++) {
+        if (!fget_line(buff, sizeof(buff), file)) {
+          flag = 0;
+          break;
+        }
+        printf("%s", buff);
+      }
+    }
+    printf("%s", buff);
+  }
+  if (fclose(file) != 0) {
+    fprintf(stderr, "Can't close file\n");
+  }
   return 0;
 }
 
-void dirout(DIR * cdir, char * path, char * file_name) {
-  DIR * hdir;
-  char
-  var [254];
-  struct dirent * entry;
-  int flag = 0;
-
-  if (!strcmp(path, "/")) {
-    path[0] = '\0';
+char * fget_line(char * buffer, int max, FILE * fp) {
+  int c;
+  char * p;
+  for (p = buffer, max--; max > 0; max--) {
+    if ((c = fgetc(fp)) == EOF)
+      break;
+    * p++ = c;
+    if (c == '\n')
+      break;
   }
-
-  while ((entry = readdir(cdir)) != NULL) {
-    sprintf(var, "%s/%s", path, entry -> d_name);
-    hdir = opendir(var);
-    if (errno == ENOTDIR) {
-      file_cnt++;
-      if (!strcmp(entry -> d_name, file_name)) {
-        printf("dirs - %d files - %d\n", dir_cnt, file_cnt);
-        write_file_info(var, file_name);
-        break;
-      }
-    } else {
-      dir_cnt++;
-      dirout(hdir,
-        var, file_name);
-      flag = 1;
-    }
-  }
-  if (flag == 1)
-    closedir(hdir);
-}
-
-void write_file_info(char * path, char * name) {
-  struct stat st1;
-  stat(path, & st1);
-  printf("%s %s %lu %lu %d %lu %lu \n", path, name, st1.st_size, st1.st_mtime, st1.st_mode, (uintmax_t) st1.st_ino);
+  * p = 0;
+  if (p == buffer || c == EOF)
+    return NULL;
+  return (p);
 }
