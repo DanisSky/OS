@@ -36,7 +36,7 @@ int main(int argc, char * argv[], char * envp[]) {
 
 void dirout(DIR * cdir, char * path, char * file_name) {
   DIR * hdir;
-  char *var = (char*) malloc(255);
+  char *var = (char*) malloc(1000);
   struct dirent * entry;
   int flag = 0;
 
