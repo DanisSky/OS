@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <inttypes.h>
+#include <stdlib.h>
 
 void dirout(DIR * cdir, char * path, char * file_name);
 void write_file_info(char *
@@ -42,8 +43,10 @@ void dirout(DIR * cdir, char * path, char * file_name) {
   if (!strcmp(path, "/")) {
     path[0] = '\0';
   }
-
   while ((entry = readdir(cdir)) != NULL) {
+      if(!strcmp(entry-> d_name, ".") | !strcmp(entry-> d_name, "..")){
+          continue;
+      }
     sprintf(var, "%s/%s", path, entry -> d_name);
     hdir = opendir(var);
     if (errno == ENOTDIR) {
@@ -55,8 +58,7 @@ void dirout(DIR * cdir, char * path, char * file_name) {
       }
     } else {
       dir_cnt++;
-      dirout(hdir,
-        var, file_name);
+      dirout(hdir, var, file_name);
       flag = 1;
     }
   }
