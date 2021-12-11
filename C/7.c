@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <inttypes.h>
 #include <stdlib.h>
+#include <time.h>
 
 void dirout(DIR * cdir, char * path, char * file_name);
 void write_file_info(char *
@@ -69,5 +70,13 @@ void dirout(DIR * cdir, char * path, char * file_name) {
 void write_file_info(char * path, char * name) {
   struct stat st1;
   stat(path, & st1);
-  printf("%s %s %lu %lu %d %lu\n", path, name, st1.st_size, st1.st_mtime, st1.st_mode, (uintmax_t) st1.st_ino);
+  time_t t = st1.st_mtime;
+struct tm lt;
+  localtime_r(&t, &lt);
+  char timbuf[100];
+  strftime(timbuf, sizeof(timbuf), "%c", &lt);
+ 
+  printf("%s %s %lu %lu\n", path, name, st1.st_size, (uintmax_t) st1.st_ino);
+  printf("date: %s\n", timbuf);
+  printf("perms: %o\n", st1.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO));
 }
