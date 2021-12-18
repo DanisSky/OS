@@ -29,6 +29,7 @@ int main()
 			waitpid(fork_1, &status, 0);
 			waitpid(fork_2, &status, 0);
 			printf("Main process: %d\n", getpid());
+			printf("Main process parent: %d\n", getppid());
 		}
 	}
     struct timeb sys_time;
